@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sign In — Student Next.ai</title>
+  <link rel="stylesheet" href="../css/style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap" rel="stylesheet"/>
+  <style>body{overflow:auto;height:auto}</style>
+</head>
+<body>
+
+<div class="auth-wrap">
+  <div class="auth-card">
+
+    <div class="auth-logo-area">
+      <div class="logo-name">Student <span>Next.ai</span></div>
+      <p>AI-matched universities, real aggregates & scholarships — in one place</p>
+    </div>
+
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tabSignin" onclick="showTab('signin')">Sign in</button>
+      <button class="auth-tab" id="tabSignup" onclick="showTab('signup')">Create account</button>
+    </div>
+
+    <div class="auth-msg error" id="authError"></div>
+    <div class="auth-msg success" id="authSuccess"></div>
+
+    <!-- ════════ SIGN IN FORM ════════ -->
+    <div id="formSignin">
+      <div class="auth-form">
+        <div class="login-method-tabs">
+          <button class="lm-tab active" onclick="setLoginMethod('email',this)">Email</button>
+          <button class="lm-tab" onclick="setLoginMethod('phone',this)">Phone</button>
+        </div>
+
+        <div class="fg" id="siEmailGroup">
+          <label class="fl">Email address</label>
+          <input class="fi" type="email" id="siEmail" placeholder="your@email.com"/>
+        </div>
+        <div class="fg" id="siPhoneGroup" style="display:none">
+          <label class="fl">Phone number</label>
+          <input class="fi" type="tel" id="siPhone" placeholder="+92 300 1234567"/>
+        </div>
+        <div class="fg">
+          <label class="fl">Password</label>
+          <input class="fi" type="password" id="siPassword" placeholder="Your password"/>
+        </div>
+        <div class="fg-row">
+          <label class="checkbox-row"><input type="checkbox" id="rememberMe"/> Remember me</label>
+          <a class="forgot-link" onclick="forgotPassword()">Forgot password?</a>
+        </div>
+        <button class="auth-submit" onclick="doSignIn()">Sign in to Student Next.ai</button>
+        <p style="text-align:center;font-size:12px;color:#94a3b8">
+          No account? <a onclick="showTab('signup')" style="color:#4f46e5;cursor:pointer;font-weight:600">Create one free →</a>
+        </p>
+      </div>
+    </div>
+
+    <!-- ════════ SIGN UP FORM ════════ -->
+    <div id="formSignup" style="display:none">
+      <div class="auth-form">
+        <div class="fg">
+          <label class="fl">Full name</label>
+          <input class="fi" type="text" id="suName" placeholder="Your full name"/>
+        </div>
+
+        <div class="fg-2col">
+          <div class="fg">
+            <label class="fl">Email address</label>
+            <input class="fi" type="email" id="suEmail" placeholder="your@email.com"/>
+          </div>
+          <div class="fg">
+            <label class="fl">Phone number <span style="color:#94a3b8;font-weight:400">(optional)</span></label>
+            <input class="fi" type="tel" id="suPhone" placeholder="+92 300 1234567"/>
+          </div>
+        </div>
+
+        <div class="fg-2col">
+          <div class="fg">
+            <label class="fl">Subject interest</label>
+            <input class="fi" type="text" id="suSubject" placeholder="e.g. Computer Science"/>
+          </div>
+          <div class="fg">
+            <label class="fl">Education level</label>
+            <select class="fi" id="suEduLevel">
+              <option value="">Select...</option>
+              <option>Matric / High school</option><option>Intermediate / FSc / A-levels</option>
+              <option>Bachelor's</option><option>Master's</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="fg">
+          <label class="fl">Password</label>
+          <input class="fi" type="password" id="suPassword" placeholder="At least 8 characters"/>
+        </div>
+
+        <label class="checkbox-row">
+          <input type="checkbox" id="agreeTerms"/>
+          I agree to the Terms of Service and Privacy Policy
+        </label>
+
+        <button class="auth-submit" onclick="doSignUp()">Create free account</button>
+        <p style="text-align:center;font-size:12px;color:#94a3b8">
+          Already have an account? <a onclick="showTab('signin')" style="color:#4f46e5;cursor:pointer;font-weight:600">Sign in →</a>
+        </p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="toasts" id="toasts"></div>
+
+<script src="../js/config.js"></script>
+<script src="../js/auth.js"></script>
+</body>
+</html>

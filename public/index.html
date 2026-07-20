@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Student Next.ai — University Finder</title>
+  <link rel="stylesheet" href="css/style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Sora:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <script>
+    // SESSION GUARD — redirect to login if not signed in.
+    // main.js separately calls /api/auth/verify on load and signs the user
+    // back out if the server no longer recognizes the token.
+    if (!localStorage.getItem('sn_token')) {
+      window.location.href = 'pages/login.html';
+    }
+  </script>
+</head>
+<body>
+
+<div class="layout">
+
+  <!-- ═══════════════════ MOBILE TOP BAR — hamburger button, shown only below 640px ═══════════════════ -->
+  <div class="mobile-topbar" id="mobileTopbar">
+    <button class="hamburger-btn" id="hamburgerBtn" onclick="toggleSidebar()" aria-label="Open menu">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <div class="mobile-topbar-logo">Student <span>Next.ai</span></div>
+  </div>
+
+  <!-- ═══════════════════ SIDEBAR OVERLAY — dims the page behind the open mobile drawer ═══════════════════ -->
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+  <!-- ═══════════════════ SIDEBAR — always 30%, becomes an off-canvas drawer below 640px ═══════════════════ -->
+  <aside class="sidebar" id="sidebar">
+    <button class="sidebar-close-btn" id="sidebarCloseBtn" onclick="closeSidebar()" aria-label="Close menu">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+
+    <div class="sb-logo">
+      <div class="logo-box">
+        <svg width="36" height="36" viewBox="0 0 36 36">
+          <defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#4f46e5"/><stop offset="100%" stop-color="#14b8a6"/></linearGradient></defs>
+          <rect width="36" height="36" rx="10" fill="url(#lg)"/>
+          <text x="18" y="25" text-anchor="middle" font-family="Sora,sans-serif" font-weight="700" font-size="16" fill="white">SN</text>
+        </svg>
+      </div>
+      <div>
+        <div class="logo-name">Student <span>Next.ai</span></div>
+        <div class="logo-tag">AI university finder</div>
+      </div>
+    </div>
+
+    <nav class="sb-nav">
+      <div class="nav-group-label">Main</div>
+
+      <button class="nav-item active" onclick="go('home',this)">
+        <div class="ni-icon" style="background:#eef2ff">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4f46e5" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        </div>
+        <div class="ni-text"><span class="ni-label">Home</span><span class="ni-sub">Dashboard overview</span></div>
+      </button>
+
+      <button class="nav-item" onclick="go('search',this)">
+        <div class="ni-icon" style="background:#f0fdfa">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0d9488" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        </div>
+        <div class="ni-text"><span class="ni-label">University Finder</span><span class="ni-sub">AI-matched recommendations</span></div>
+        <span class="ni-live">AI</span>
+      </button>
+
+      <button class="nav-item" onclick="go('countries',this)">
+        <div class="ni-icon" style="background:#fdf4ff">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9333ea" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        </div>
+        <div class="ni-text"><span class="ni-label">Countries</span><span class="ni-sub" id="navCountriesSub">137 education systems</span></div>
+        <span class="ni-badge purple" id="navCountriesBadge">137</span>
+      </button>
+
+      <button class="nav-item" onclick="go('agent',this)">
+        <div class="ni-icon" style="background:#fff7ed">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/><circle cx="12" cy="16" r="1" fill="#ea580c"/></svg>
+        </div>
+        <div class="ni-text"><span class="ni-label">AI Agent Chat</span><span class="ni-sub">Education assistant</span></div>
+        <span class="ni-live">Live</span>
+      </button>
+
+      <div class="nav-group-label">Tools</div>
+
+      <button class="nav-item" onclick="go('calculator',this)">
+        <div class="ni-icon" style="background:#faeeda">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#b45309" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="8" y2="10"/><line x1="12" y1="10" x2="12" y2="10"/><line x1="16" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="8" y2="14"/><line x1="12" y1="14" x2="12" y2="14"/><line x1="16" y1="14" x2="16" y2="14"/><line x1="8" y1="18" x2="8" y2="18"/><line x1="12" y1="18" x2="12" y2="18"/></svg>
+        </div>
+        <div class="ni-text"><span class="ni-label">Aggregate Calculator</span><span class="ni-sub">Real, verified formulas</span></div>
+      </button>
+
+      <button class="nav-item" onclick="go('guides',this)">
+        <div class="ni-icon" style="background:#ecfdf5">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+        </div>
+        <div class="ni-text"><span class="ni-label">Guide Platform</span><span class="ni-sub">Directory &amp; how-tos</span></div>
+      </button>
+
+      <button class="nav-item" onclick="go('history',this)">
+        <div class="ni-icon" style="background:#eef2ff">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4f46e5" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
+        <div class="ni-text"><span class="ni-label">Search History</span><span class="ni-sub">Your past searches</span></div>
+      </button>
+
+      <div class="nav-group-label">Account</div>
+
+      <button class="nav-item" onclick="go('notifications',this)">
+        <div class="ni-icon" style="background:#eff6ff">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        </div>
+        <div class="ni-text"><span class="ni-label">Notifications</span><span class="ni-sub" id="navNotifSub">0 new</span></div>
+        <span class="ni-badge blue" id="navNotifBadge" style="display:none">0</span>
+      </button>
+
+      <button class="nav-item" onclick="go('settings',this)">
+        <div class="ni-icon" style="background:#f8fafc">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </div>
+        <div class="ni-text"><span class="ni-label">Settings</span><span class="ni-sub">Profile</span></div>
+      </button>
+
+    </nav>
+
+    <div class="sb-user">
+      <div class="user-row">
+        <div class="user-av" id="userAvatar">··</div>
+        <div class="user-info">
+          <div class="user-name" id="userName">Loading…</div>
+          <div class="user-email" id="userEmail"></div>
+        </div>
+        <button class="user-more" onclick="toggleUserMenu()">⋯</button>
+      </div>
+      <div class="user-dropdown" id="userDropdown" style="display:none">
+        <button onclick="go('settings',document.querySelector('[onclick*=settings]'))">⚙️ Settings</button>
+        <button onclick="signOut()">🚪 Sign out</button>
+      </div>
+    </div>
+
+  </aside>
+
+  <!-- ═══════════════════ MAIN 70% ═══════════════════ -->
+  <main class="main">
+
+    <!-- ── HOME ── -->
+    <div class="screen active" id="s-home">
+      <div class="page-head">
+        <div>
+          <h1 id="homeGreeting">Good morning 👋</h1>
+          <p id="homeSub">Your matches are recalculated instantly whenever you search</p>
+          <p class="offer-intro">Here's what Student Next.ai offers:</p>
+          <div class="offer-row">
+            <span class="offer-chip">🎓 410 universities</span>
+            <span class="offer-chip">🌍 137 countries</span>
+            <span class="offer-chip">🤖 AI-matched recommendations</span>
+            <span class="offer-chip">📊 Real aggregate calculators</span>
+            <span class="offer-chip">💬 24/7 AI counselor</span>
+          </div>
+        </div>
+        <button class="btn-primary" onclick="go('search',document.querySelector('[onclick*=\"search\"]'))">Find my university</button>
+      </div>
+      <div class="stat-row">
+        <div class="scard fade-up" style="--d:0s"><div class="scard-icon" style="background:#eef2ff;color:#4f46e5"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.35a2 2 0 0 1 1.8-2.15h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8a16 16 0 0 0 8.09 8.09l.61-.61a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div><div class="scard-val" style="color:#4f46e5" id="statSearches">0</div><div class="scard-label">Searches run</div><div class="scard-trend">All-time, this account</div></div>
+        <div class="scard fade-up" style="--d:.05s"><div class="scard-icon" style="background:#f0fdfa;color:#0d9488"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div><div class="scard-val" style="color:#0d9488" id="statCountries">137</div><div class="scard-label">Countries covered</div><div class="scard-trend">Top-ranked universities each</div></div>
+        <div class="scard fade-up" style="--d:.1s"><div class="scard-icon" style="background:#fdf4ff;color:#9333ea"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg></div><div class="scard-val" style="color:#9333ea" id="statUniversities">410</div><div class="scard-label">Universities in database</div><div class="scard-trend">Real, source-linked entries</div></div>
+        <div class="scard fade-up" style="--d:.15s"><div class="scard-icon" style="background:#fce7f3;color:#db2777"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div><div class="scard-val" style="color:#db2777" id="statNotifs">0</div><div class="scard-label">Notifications</div><div class="scard-trend" id="statNotifsSub">Unread</div></div>
+      </div>
+      <div class="agent-banner">
+        <div class="agent-banner-l"><div class="agent-pulse-dot"></div><div><div class="ab-title">University Finder is ready</div><div class="ab-sub">Tell it your marks, interest, and country — it'll suggest a field, its global scope, and the best-matched real university at home and abroad</div></div></div>
+        <button class="btn-primary sm" onclick="go('search',document.querySelector('[onclick*=\"search\"]'))">Try it now →</button>
+      </div>
+      <div class="sec-title">Explore the database</div>
+      <div class="uni-card-grid" id="homeFeatured"><p style="color:#94a3b8;font-size:13px">Loading…</p></div>
+    </div>
+
+    <!-- ── UNIVERSITY FINDER (SEARCH) ── -->
+    <div class="screen" id="s-search">
+      <div class="page-head">
+        <div><h1>University Finder</h1><p>Get an AI-matched recommendation, or browse the 410-university dataset manually</p></div>
+      </div>
+
+      <div class="tabbar">
+        <button class="tab-btn on" id="searchTab-ai" onclick="switchSearchTab('ai')">🤖 AI Recommendation</button>
+        <button class="tab-btn" id="searchTab-manual" onclick="switchSearchTab('manual')">🔍 Browse Manually</button>
+      </div>
+
+      <!-- AI RECOMMENDATION TAB -->
+      <div id="searchPane-ai">
+        <div class="engine">
+          <div class="advisor-form-grid">
+            <div class="fg"><label class="fl">Your name</label><input class="fi" id="advName" placeholder="e.g. Ayesha Khan"/></div>
+            <div class="fg"><label class="fl">Education level</label>
+              <select class="fi" id="advEduLevel">
+                <option value="">Select...</option>
+                <option>Matric / High school</option><option>Intermediate / FSc / A-levels</option>
+                <option>Bachelor's</option><option>Master's</option>
+              </select>
+            </div>
+            <div class="fg"><label class="fl">Marks obtained</label><input class="fi" id="advMarksObtained" type="number" placeholder="e.g. 850"/></div>
+            <div class="fg"><label class="fl">Out of total marks</label><input class="fi" id="advMarksTotal" type="number" placeholder="e.g. 1100"/></div>
+            <div class="fg wide"><label class="fl">Field of interest</label><input class="fi" id="advInterest" placeholder="e.g. I love coding and building apps — not sure what to call it"/></div>
+            <div class="fg"><label class="fl">Your country</label><input class="fi" id="advCountry" list="countryList" placeholder="e.g. Pakistan"/></div>
+            <div class="fg"><label class="fl">Study abroad in <span class="fl-opt">(optional)</span></label><input class="fi" id="advTargetCountry" list="countryList" placeholder="Leave blank for a suggestion"/></div>
+          </div>
+          <datalist id="countryList"></datalist>
+          <button class="run-btn" onclick="runAdvisor()">🎓 Get My Recommendation</button>
+          <div id="advisorResult"></div>
+        </div>
+      </div>
+
+      <!-- MANUAL BROWSE TAB -->
+      <div id="searchPane-manual" style="display:none">
+        <div class="engine">
+          <div class="eblock">
+            <div class="eblock-label"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg> Select countries <button class="sel-all" id="selAllBtn" onclick="selectAllCountries()">Select all</button></div>
+            <div class="ppicker" id="ppicker"></div>
+            <div class="pcount" id="pcount">Loading countries…</div>
+          </div>
+          <div class="eblock">
+            <div class="eblock-label"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg> Degree level</div>
+            <div class="tgroup" id="dg"><button class="tbtn on" onclick="tgl(this,'dg')">All levels</button><button class="tbtn" onclick="tgl(this,'dg')">Undergraduate</button><button class="tbtn" onclick="tgl(this,'dg')">Graduate</button></div>
+          </div>
+          <div class="eblock">
+            <div class="eblock-label"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg> Search by field or university name</div>
+            <div class="search-row-wrap"><input type="text" class="search-big" id="sq" placeholder="e.g.  Computer Science, NUST, MIT..." onkeypress="if(event.key==='Enter')doSearch()"/><button class="btn-search" onclick="doSearch()">Search</button></div>
+            <div class="qtags"><span class="qt" onclick="qs('Computer Science')">Computer Science</span><span class="qt" onclick="qs('Engineering')">Engineering</span><span class="qt" onclick="qs('Business Administration')">Business</span><span class="qt" onclick="qs('Medicine')">Medicine</span></div>
+          </div>
+          <button class="run-btn" onclick="doSearch()">🔍 Search Universities <span class="run-key">Enter ↵</span></button>
+          <div id="results" style="display:none"><div class="res-hdr">Found <strong id="rcnt">0</strong> matching programs</div><div class="job-list" id="rlist"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── COUNTRIES ── -->
+    <div class="screen" id="s-countries">
+      <div class="page-head">
+        <div><h1>Countries</h1><p id="countriesSubHead">137 countries seeded — university count and formula-verification status below</p></div>
+        <div class="filter-row"><button class="ftab on" onclick="fc('all',this)">All</button><button class="ftab" onclick="fc('verified',this)">Verified formula</button><button class="ftab" onclick="fc('holistic',this)">Holistic / rank-based</button></div>
+      </div>
+      <p style="font-size:12.5px;color:#94a3b8;margin:-6px 0 16px;max-width:640px">Only Pakistan's NUST and FAST-NUCES publish a fixed weighted percentage formula that's been verified this session — every other country/university uses its real named admission system (Gaokao, JEE, YKS, ENEM, WASSCE, Bagrut+PET, and 100+ more), tagged honestly instead of forced into the calculator.</p>
+      <div class="pgrid" id="pgrid"><p style="color:#94a3b8;font-size:13px">Loading countries…</p></div>
+    </div>
+
+    <!-- ── AI AGENT ── -->
+    <div class="screen" id="s-agent">
+      <div class="page-head"><div><h1>AI Agent Chat</h1><p>Ask anything about universities, aggregates, tests, and scholarships — 24/7</p></div><button class="btn-outline" onclick="clearChat()">Clear chat</button></div>
+      <div class="chat-layout">
+        <div class="chat-topics">
+          <div class="ct-label">Quick topics</div>
+          <button class="ctbtn" onclick="askT('How is my aggregate calculated?')"><span class="ctd" style="background:#4f46e5"></span>How aggregates are calculated</button>
+          <button class="ctbtn" onclick="askT('What test do I need for Pakistan universities?')"><span class="ctd" style="background:#0d9488"></span>Tests for Pakistan</button>
+          <button class="ctbtn" onclick="askT('Tips for JEE Advanced preparation')"><span class="ctd" style="background:#ea580c"></span>JEE prep tips</button>
+          <button class="ctbtn" onclick="askT('What scholarships are available?')"><span class="ctd" style="background:#db2777"></span>Scholarships overview</button>
+          <button class="ctbtn" onclick="askT('Find Computer Science programs in Canada')"><span class="ctd" style="background:#22c55e"></span>Find matching programs</button>
+          <button class="ctbtn" onclick="askT('How does the University Finder pick a university?')"><span class="ctd" style="background:#9333ea"></span>How the AI Finder works</button>
+          <button class="ctbtn" onclick="askT('How does the matching engine work?')"><span class="ctd" style="background:#06b6d4"></span>How matching works</button>
+        </div>
+        <div class="chat-window">
+          <div class="cw-header"><div class="cw-av">🎓</div><div class="cw-av-info"><div class="cw-name">Student Next.ai Assistant</div><div class="cw-status"><span class="online-dot"></span>Online</div></div></div>
+          <div class="chat-msgs" id="chatMsgs"><div class="cmsg bot"><div class="cmsg-bbl">Hi! I'm the Student Next.ai assistant. I can help you find universities, calculate your aggregate, understand admission tests, and find scholarships.<br/><br/>What would you like help with today?</div></div></div>
+          <div class="chat-inp-row"><input type="text" class="chat-inp" id="chatInp" placeholder="Ask anything about universities or tests..." onkeypress="if(event.key==='Enter')sendChat()"/><button class="chat-send" onclick="sendChat()"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m22 2-7 20-4-9-9-4 20-7z"/></svg></button></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── CALCULATOR ── -->
+    <div class="screen" id="s-calculator">
+      <div class="page-head"><div><h1>Aggregate Calculator</h1><p>Only shows a formula where one is actually verified — otherwise explains the real admission system</p></div></div>
+      <div class="block-card">
+        <div class="sec-title">Pick a country</div>
+        <div class="form-2col">
+          <div class="fg"><label class="fl">Country</label><select class="fi" id="calcCountry" onchange="loadFormulasForCountry()"></select></div>
+          <div class="fg"><label class="fl">Formula</label><select class="fi" id="calcFormula" onchange="renderFormulaInputs()"></select></div>
+        </div>
+        <div id="calcInputs"></div>
+        <button class="btn-primary" onclick="runCalculator()" style="margin-top:10px">Calculate</button>
+        <div id="calcResult" style="display:none;margin-top:16px"></div>
+      </div>
+    </div>
+
+    <!-- ── GUIDE PLATFORM ── -->
+    <div class="screen" id="s-guides">
+      <div class="page-head"><div><h1>Guide Platform</h1><p>Browse the full university directory, or read a test &amp; application how-to</p></div></div>
+
+      <div class="tabbar">
+        <button class="tab-btn on" id="guidesTab-directory" onclick="switchGuidesTab('directory')">🌍 University Directory</button>
+        <button class="tab-btn" id="guidesTab-articles" onclick="switchGuidesTab('articles')">📖 Test &amp; Application Guides</button>
+      </div>
+
+      <!-- UNIVERSITY DIRECTORY TAB -->
+      <div id="guidesPane-directory">
+        <div class="fg" style="max-width:340px;margin-bottom:16px"><label class="fl">Country</label><select class="fi" id="dirCountry" onchange="loadDirectoryCountry()"></select></div>
+        <div id="dirResults"><p style="color:#94a3b8;font-size:13px">Loading…</p></div>
+      </div>
+
+      <!-- ARTICLES TAB -->
+      <div id="guidesPane-articles" style="display:none">
+        <div class="guides-grid">
+          <div class="gcard" onclick="openGuide('net')"><div class="gbar" style="background:#4f46e5"></div><div class="gbody"><div class="glogo" style="background:#4f46e5">NET</div><span class="gtag" style="background:#eef2ff;color:#4338ca">Pakistan</span><h3>NUST Entry Test (NET)</h3><p>Syllabus breakdown, weighting, and how to prepare for NUST's own test</p><div class="gfooter"><span>📖 6 min</span><span class="gpop">⭐ Most popular</span></div><div class="gread">Read full guide →</div></div></div>
+          <div class="gcard" onclick="openGuide('fast')"><div class="gbar" style="background:#16a34a"></div><div class="gbody"><div class="glogo" style="background:#16a34a">FE</div><span class="gtag" style="background:#f0fdf4;color:#15803d">Pakistan</span><h3>FAST-NUCES Entry Test</h3><p>What's tested, how the 10/40/50 formula works, and prep resources</p><div class="gfooter"><span>📖 5 min</span></div><div class="gread">Read full guide →</div></div></div>
+          <div class="gcard" onclick="openGuide('jee')"><div class="gbar" style="background:#ea580c"></div><div class="gbody"><div class="glogo" style="background:#ea580c">JEE</div><span class="gtag" style="background:#fff7ed;color:#c2410c">India</span><h3>JEE Main &amp; Advanced</h3><p>How the two-stage exam works, and what rank gets you into which IIT branch</p><div class="gfooter"><span>📖 8 min</span><span class="gpop">🔥 Trending</span></div><div class="gread">Read full guide →</div></div></div>
+          <div class="gcard" onclick="openGuide('gaokao')"><div class="gbar" style="background:#dc2626"></div><div class="gbody"><div class="glogo" style="background:#dc2626">GK</div><span class="gtag" style="background:#fef2f2;color:#b91c1c">China</span><h3>Understanding the Gaokao</h3><p>Structure, provincial variation, and how it drives university placement</p><div class="gfooter"><span>📖 7 min</span></div><div class="gread">Read full guide →</div></div></div>
+          <div class="gcard" onclick="openGuide('ucas')"><div class="gbar" style="background:#0a66c2"></div><div class="gbody"><div class="glogo" style="background:#0a66c2">UC</div><span class="gtag" style="background:#eff6ff;color:#1d4ed8">UK</span><h3>Applying via UCAS</h3><p>Personal statements, predicted grades, and college interviews explained</p><div class="gfooter"><span>📖 7 min</span></div><div class="gread">Read full guide →</div></div></div>
+          <div class="gcard" onclick="openGuide('calculator')"><div class="gbar" style="background:#b45309"></div><div class="gbody"><div class="glogo" style="background:#b45309">%</div><span class="gtag" style="background:#faeeda;color:#78350f">All</span><h3>How the aggregate calculator works</h3><p>What's verified, what isn't, and why some countries show no formula at all</p><div class="gfooter"><span>📖 4 min</span></div><div class="gread">Read full guide →</div></div></div>
+          <div class="gcard" onclick="openGuide('scholarships')"><div class="gbar" style="background:#be185d"></div><div class="gbody"><div class="glogo" style="background:#be185d">$</div><span class="gtag" style="background:#fdf2f8;color:#9d174d">All</span><h3>Applying for scholarships</h3><p>Need-based vs. merit-based, deadlines, and what to prepare in advance</p><div class="gfooter"><span>📖 5 min</span></div><div class="gread">Read full guide →</div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── NOTIFICATIONS ── -->
+    <div class="screen" id="s-notifications">
+      <div class="page-head"><div><h1>Notifications</h1><p id="notifSubHead">Real events from your account — recommendations and search activity</p></div><button class="btn-outline" onclick="markAllRead()">Mark all read</button></div>
+      <div class="notif-list" id="notifList">
+        <div class="nitem"><div class="ni-body"><div class="ni-t">No notifications yet</div><div class="ni-p">Run a University Finder recommendation or a search to start generating real activity here.</div></div></div>
+      </div>
+    </div>
+
+    <!-- ── SETTINGS ── -->
+    <div class="screen" id="s-settings">
+      <div class="page-head"><div><h1>Settings</h1><p>Manage your profile</p></div></div>
+      <div class="settings-grid">
+        <div class="block-card">
+          <div class="sec-title">Profile</div>
+          <div class="fg"><label class="fl">Full name</label><input class="fi" id="setName"/></div>
+          <div class="fg"><label class="fl">Email address</label><input class="fi" id="setEmail" type="email"/></div>
+          <div class="fg"><label class="fl">Subject interest</label><input class="fi" id="setSubject" placeholder="Computer Science"/></div>
+          <div class="fg"><label class="fl">Education level</label>
+            <select class="fi" id="setEduLevel">
+              <option value="">Select...</option>
+              <option>Matric / High school</option><option>Intermediate / FSc / A-levels</option>
+              <option>Bachelor's</option><option>Master's</option>
+            </select>
+          </div>
+          <div class="fg"><label class="fl">New password</label><input class="fi" id="setPassword" type="password" placeholder="Leave blank to keep current"/></div>
+          <button class="btn-primary" onclick="saveProfile()">Save profile</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SEARCH HISTORY ── -->
+    <div class="screen" id="s-history">
+      <div class="page-head"><div><h1>Search History</h1><p>Every search and recommendation you've made, saved automatically to your account</p></div><button class="btn-outline" onclick="clearHistory()">Clear history</button></div>
+      <div class="history-list" id="historyList">
+        <div class="hist-row"><div class="hist-info"><div class="hist-query">No searches yet</div><div class="hist-meta">Run a search to see it appear here</div></div></div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- GUIDE / UNIVERSITY MODAL -->
+<div class="modal" id="modal" onclick="closeModal(event)"><div class="modal-box"><button class="modal-x" onclick="closeModalDirect()">✕</button><div id="modal-body"></div></div></div>
+
+<!-- TOAST -->
+<div class="toasts" id="toasts"></div>
+
+<script src="js/config.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

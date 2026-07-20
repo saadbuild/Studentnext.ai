@@ -1,0 +1,9 @@
+flask==3.0.0
+flask-cors==4.0.0
+python-dotenv==1.0.0
+SQLAlchemy==2.0.30
+# Optional — only needed if you set ANTHROPIC_API_KEY for a real LLM chatbot
+# and University Finder recommendations:
+anthropic==0.34.2
+# Optional — only needed if you set DATABASE_URL to a Postgres connection string:
+psycopg2-binary==2.9.9
